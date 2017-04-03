@@ -1,4 +1,4 @@
-# LSTM for international airline passengers problem with time step regression framing
+# LSTM for international airline passengers problem with memory
 import numpy
 import matplotlib.pyplot as plt
 from pandas import read_csv
@@ -37,14 +37,18 @@ testX, testY = create_dataset(test, look_back)
 trainX = numpy.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
 testX = numpy.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 # create and fit the LSTM network
+batch_size = 1
 model = Sequential()
-model.add(LSTM(4, input_shape=(look_back, 1)))
+model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
+for i in range(100):
+	model.fit(trainX, trainY, epochs=1, batch_size=batch_size, verbose=2, shuffle=False)
+	model.reset_states()
 # make predictions
-trainPredict = model.predict(trainX)
-testPredict = model.predict(testX)
+trainPredict = model.predict(trainX, batch_size=batch_size)
+model.reset_states()
+testPredict = model.predict(testX, batch_size=batch_size)
 # invert predictions
 trainPredict = scaler.inverse_transform(trainPredict)
 trainY = scaler.inverse_transform([trainY])
