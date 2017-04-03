@@ -1,4 +1,4 @@
-# LSTM for international airline passengers problem with window regression framing
+# LSTM for international airline passengers problem with time step regression framing
 import numpy
 import matplotlib.pyplot as plt
 from pandas import read_csv
@@ -34,11 +34,11 @@ look_back = 3
 trainX, trainY = create_dataset(train, look_back)
 testX, testY = create_dataset(test, look_back)
 # reshape input to be [samples, time steps, features]
-trainX = numpy.reshape(trainX, (trainX.shape[0], 1, trainX.shape[1]))
-testX = numpy.reshape(testX, (testX.shape[0], 1, testX.shape[1]))
+trainX = numpy.reshape(trainX, (trainX.shape[0], trainX.shape[1], 1))
+testX = numpy.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(1, look_back)))
+model.add(LSTM(4, input_shape=(look_back, 1)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 model.fit(trainX, trainY, epochs=100, batch_size=1, verbose=2)
