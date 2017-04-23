@@ -26,14 +26,18 @@ X_test = X_test.astype('float32')
 X_train = X_train / 255.0
 X_test = X_test / 255.0
 
+print "size of A:- %d"%len(X_train[0])
+
 # one hot encode outputs
 y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 num_classes = y_test.shape[1]
 
+# print "size of y = %d num_classes = %d"%(len(y_test[0]), num_classes)
+
 # Create the model
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=(3, 32, 32), padding='same', activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Conv2D(32, (3, 3), input_shape=(3, 32, 32), padding='same', activation='relu', kernel_constraint=maxnorm)
 model.add(Dropout(0.2))
 model.add(Conv2D(32, (3, 3), activation='relu', padding='same', kernel_constraint=maxnorm(3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -43,8 +47,8 @@ model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 # Compile model
-epochs = 25
-lrate = 0.01
+epochs = 1
+lrate = 0.1
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
