@@ -32,7 +32,7 @@ def formate_data():
 	print "%d"%cols
  
 	# matrix = [[[0 for col in range(div_x)] for row in range(div_y)] for x in range(days)]
-	matrix = [[[[0.1 for col in range(div_x)] for row in range(div_y)] for a in range(1)] for x in range(days)]
+	matrix = [[[[0 for col in range(div_x)] for row in range(div_y)] for a in range(1)] for x in range(days)]
 
 	for i in range(1, rows):
 		day = int(worksheet.cell_value(i, 1))

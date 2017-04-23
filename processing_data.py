@@ -3,6 +3,8 @@ from formate_data import formate_data
 
 #import basic neural net
 import numpy
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 from keras.models import Sequential
 from keras.layers import Dense
 
@@ -38,20 +40,29 @@ numpy.random.seed(7)
 
 matrix = formate_data()
 
+# X_train = matrix[0:26, :, :]
 X_train = matrix[0:26, :, :, :]
+# X_test = matrix[25:31, :, :]
 X_test = matrix[25:31, :, :, :]
 # Y_train = numpy.delete(matrix, (0), axis=0)
+# Y_train = numpy.sum(numpy.delete(X_train, (0), axis=0), axis=1)
+# Y_train = numpy.sum(Y_train, axis=1)
 Y_train = numpy.sum(numpy.delete(X_train, (0), axis=0), axis=2)
 Y_train = numpy.sum(Y_train, axis=2)
 
+# X_train = matrix[0:25, :, :]
 X_train = matrix[0:25, :, :, :]
 
+# Y_test = numpy.sum(numpy.delete(X_test, (0), axis=0), axis=1)
+# Y_test = numpy.sum(Y_test, axis=1)
 Y_test = numpy.sum(numpy.delete(X_test, (0), axis=0), axis=2)
 Y_test = numpy.sum(Y_test, axis=2)
 
+# X_test = matrix[0:5, :, :]
 X_test = matrix[0:5, :, :, :]
 
 # Y_train = numpy.reshape(Y_train, (-1, 1))
+# Y_test = numpy.reshape(Y_test, (-1, 1))
 # print "size of y = %s"%Y_train.shape
 
 num_classes = Y_train.shape[1]
@@ -91,13 +102,13 @@ num_classes = Y_train.shape[1]
 
 # implementation of CNN
 model = Sequential()
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(1, 32, 32), kernel_constraint=maxnorm(3)))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(1, 32, 32)))
 model.add(Dropout(0.2))
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu', kernel_constraint=maxnorm(3)))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
 # model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(MaxPooling2D(pool_size=(2, 2), dim_ordering="th"))
 model.add(Flatten())
-model.add(Dense(512, activation='sigmoid', kernel_constraint=maxnorm(3)))
+model.add(Dense(512, activation='sigmoid'))
 model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
@@ -125,7 +136,7 @@ lrate = 0.1
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 # model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
-model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 print(model.summary())
 
 # Fit the model
