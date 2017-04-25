@@ -42,7 +42,7 @@ def formate_data():
 		c_x = int((x-least_x)/size_x)
 		# print "day:- %d row:- %d col:- %d"%(day, c_y, c_x)
 		# matrix[day][c_y][c_x] +=1
-		matrix[day][0][c_y][c_x] +=1
+		matrix[day][0][c_y][c_x] +=0.0018
 		# print "day:- %d row:- %d"%(day, c_y*div_x + c_x)
 		# matrix[day][c_y*div_x + c_x] +=1
 

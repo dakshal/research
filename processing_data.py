@@ -10,6 +10,7 @@ from keras.layers import Dense
 
 #import CNN
 from keras.layers import Dropout
+from keras.layers import Reshape
 from keras.layers import Flatten
 from keras.constraints import maxnorm
 from keras.optimizers import SGD
@@ -40,26 +41,32 @@ numpy.random.seed(7)
 
 matrix = formate_data()
 
-# X_train = matrix[0:26, :, :]
-X_train = matrix[0:26, :, :, :]
-# X_test = matrix[25:31, :, :]
-X_test = matrix[25:31, :, :, :]
+size = 25
+max_size = 31
+
+# X_train = matrix[0:size+1, :, :]
+X_train = matrix[0:size+1, :, :, :]
+# X_test = matrix[size:max_size, :, :]
+X_test = matrix[size:max_size, :, :, :]
 # Y_train = numpy.delete(matrix, (0), axis=0)
 # Y_train = numpy.sum(numpy.delete(X_train, (0), axis=0), axis=1)
 # Y_train = numpy.sum(Y_train, axis=1)
-Y_train = numpy.sum(numpy.delete(X_train, (0), axis=0), axis=2)
-Y_train = numpy.sum(Y_train, axis=2)
+# Y_train = numpy.sum(numpy.delete(X_train, (0), axis=0), axis=2)
+# Y_train = numpy.sum(Y_train, axis=2)
+Y_train = numpy.delete(X_train, (0), axis=0)
 
-# X_train = matrix[0:25, :, :]
-X_train = matrix[0:25, :, :, :]
+
+# X_train = matrix[0:size, :, :]
+X_train = matrix[0:size, :, :, :]
 
 # Y_test = numpy.sum(numpy.delete(X_test, (0), axis=0), axis=1)
 # Y_test = numpy.sum(Y_test, axis=1)
-Y_test = numpy.sum(numpy.delete(X_test, (0), axis=0), axis=2)
-Y_test = numpy.sum(Y_test, axis=2)
+# Y_test = numpy.sum(numpy.delete(X_test, (0), axis=0), axis=2)
+# Y_test = numpy.sum(Y_test, axis=2)
+Y_test = numpy.delete(X_test, (0), axis=0)
 
-# X_test = matrix[0:5, :, :]
-X_test = matrix[0:5, :, :, :]
+# X_test = matrix[size:max_size, :, :]
+X_test = matrix[size:max_size-1, :, :, :]
 
 # Y_train = numpy.reshape(Y_train, (-1, 1))
 # Y_test = numpy.reshape(Y_test, (-1, 1))
@@ -68,7 +75,7 @@ X_test = matrix[0:5, :, :, :]
 num_classes = Y_train.shape[1]
 
 
-
+# Y_train = Y_train[24, :]
 ## a simple 3 layer neural net
 # model = Sequential()
 # model.add(Dense(12, input_dim=8, activation='relu'))
@@ -99,10 +106,12 @@ num_classes = Y_train.shape[1]
 
 # vqa_model = Model(inputs=[image_input, question_input], outputs=output)
 
+div_x = 32
+div_y = 32
 
 # implementation of CNN
 model = Sequential()
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(1, 32, 32)))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(1, div_x, div_y)))
 model.add(Dropout(0.2))
 model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
 # model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -110,7 +119,8 @@ model.add(MaxPooling2D(pool_size=(2, 2), dim_ordering="th"))
 model.add(Flatten())
 model.add(Dense(512, activation='sigmoid'))
 model.add(Dropout(0.5))
-model.add(Dense(num_classes, activation='softmax'))
+# model.add(Dense(num_classes=400, activation='softmax'))
+model.add(Dense(div_x*div_y, activation='softmax'))
 
 ## adding RNN Components
 
@@ -125,22 +135,27 @@ model.add(Dense(num_classes, activation='softmax'))
 # model.add(Dense(512, activation='relu', kernel_constraint=maxnorm(3)))
 # model.add(Flatten())
 # model.add(MaxPooling2D(pool_size=(2, 2)))
-# model.add(Conv2DTranspose(32, (3, 3), activation='relu', padding='same'))
+model.add(Reshape((div_x, div_y)))
+model.add(Reshape((1, div_x, div_y)))
+model.add(Conv2DTranspose(32, (3, 3), activation='relu', padding='same', input_shape=(1, div_x, div_y)))
 # model.add(Dropout(0.2))
 # model.add(Conv2D(32, (30, 30), input_shape=(30, 32, 32), padding='same', activation='relu', kernel_constraint=maxnorm(3)))
 
 
 # Compile model
-epochs = 10
+epochs = 100
 lrate = 0.1
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 # model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
-model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
 print(model.summary())
 
 # Fit the model
-model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=20)
+# model.fit(X_train, Y_train, epochs=epochs, batch_size=25)
+model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=5)
 
-
+# scores = model.evaluate(X_test, Y_test)
+# print("\n%s: %.2f%%"%(model.metrics_names[1],scores[1]*100))
 
