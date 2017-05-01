@@ -41,8 +41,8 @@ numpy.random.seed(7)
 
 matrix = formate_data()
 
-size = 25
-max_size = 31
+size = 250
+max_size = 305
 
 # X_train = matrix[0:size+1, :, :]
 X_train = matrix[0:size+1, :, :, :]
@@ -111,7 +111,7 @@ div_y = 32
 
 # implementation of CNN
 model = Sequential()
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(1, div_x, div_y)))
+model.add(Conv2D(div_y, (3, 3), padding='same', activation='relu', input_shape=(1, div_x, div_y)))
 model.add(Dropout(0.2))
 model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
 # model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -135,27 +135,30 @@ model.add(Dense(div_x*div_y, activation='softmax'))
 # model.add(Dense(512, activation='relu', kernel_constraint=maxnorm(3)))
 # model.add(Flatten())
 # model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Reshape((div_x, div_y)))
+# model.add(Reshape((div_x, div_y)))
 model.add(Reshape((1, div_x, div_y)))
-model.add(Conv2DTranspose(32, (3, 3), activation='relu', padding='same', input_shape=(1, div_x, div_y)))
+model.add(Conv2DTranspose(div_y, (3, 3), activation='relu', padding='same', input_shape=(1, div_x, div_y)))
 # model.add(Dropout(0.2))
 # model.add(Conv2D(32, (30, 30), input_shape=(30, 32, 32), padding='same', activation='relu', kernel_constraint=maxnorm(3)))
 
 
 # Compile model
-epochs = 100
+epochs = 1000
 lrate = 0.1
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 # model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mean_squared_error', optimizer=sgd, metrics=['accuracy'])
+# model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+# model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 print(model.summary())
 
 # Fit the model
 # model.fit(X_train, Y_train, epochs=epochs, batch_size=25)
-model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=5)
+model.fit(X_train, Y_train, epochs=epochs, batch_size=250)
 
-# scores = model.evaluate(X_test, Y_test)
-# print("\n%s: %.2f%%"%(model.metrics_names[1],scores[1]*100))
+scores = model.evaluate(X_test, Y_test)
+print("\n%s: %.2f%%"%(model.metrics_names[1],scores[1]*100))
 
+prediction = model.predict(X_test)

@@ -15,14 +15,15 @@ def formate_data():
 	diff_y = 185140
 	least_x = 7547902
 	least_y = 602723	
-	size_x = diff_x/div_x
-	size_y = diff_y/div_y
+	size_x = diff_x/(div_x-1)
+	size_y = diff_y/(div_y-1) 
 
 	# worksheet.col(0)
 
-	days = 31 # 305
-	rows = 13032
-	# rows = worksheet.nrows
+	# days = 31 # 305
+	days = 306
+	# rows = 13032
+	rows = worksheet.nrows
 	cols = worksheet.ncols
 
 
@@ -42,7 +43,7 @@ def formate_data():
 		c_x = int((x-least_x)/size_x)
 		# print "day:- %d row:- %d col:- %d"%(day, c_y, c_x)
 		# matrix[day][c_y][c_x] +=1
-		matrix[day][0][c_y][c_x] +=0.0018
+		matrix[day][0][c_y][c_x] +=1
 		# print "day:- %d row:- %d"%(day, c_y*div_x + c_x)
 		# matrix[day][c_y*div_x + c_x] +=1
 
