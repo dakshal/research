@@ -117,7 +117,7 @@ model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
 # model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(MaxPooling2D(pool_size=(2, 2), dim_ordering="th"))
 model.add(Flatten())
-model.add(Dense(512, activation='sigmoid'))
+model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.5))
 # model.add(Dense(num_classes=400, activation='softmax'))
 model.add(Dense(div_x*div_y, activation='softmax'))
@@ -143,12 +143,14 @@ model.add(Conv2DTranspose(div_y, (3, 3), activation='relu', padding='same', inpu
 
 
 # Compile model
-epochs = 1000
+epochs = 500
 lrate = 0.1
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 # model.compile(loss='sparse_categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+# model.compile(loss='mean_absolute_error', optimizer=sgd, metrics=['accuracy'])
 model.compile(loss='mean_squared_error', optimizer=sgd, metrics=['accuracy'])
+# model.compile(loss='mean_squared_error', optimizer=sgd, metrics=['accuracy'])
 # model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 # model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -162,3 +164,15 @@ scores = model.evaluate(X_test, Y_test)
 print("\n%s: %.2f%%"%(model.metrics_names[1],scores[1]*100))
 
 prediction = model.predict(X_test)
+
+pred = numpy.sum(prediction, axis=2)
+pred.shape
+pred = numpy.sum(pred, axis=2)
+pred.shape
+pred = numpy.sum(pred, axis=0)
+
+actual = numpy.sum(Y_test, axis=2)
+actual = numpy.sum(actual, axis=2)
+actual = numpy.sum(actual, axis=0)
+
+actual, pred
