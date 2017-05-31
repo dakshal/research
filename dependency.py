@@ -1,4 +1,4 @@
-# Stacked LSTM for international airline passengers problem with memory
+	# Stacked LSTM for international airline passengers problem with memory
 import numpy
 import matplotlib.pyplot as plt
 from pandas import read_csv
